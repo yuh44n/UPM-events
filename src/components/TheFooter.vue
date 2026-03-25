@@ -1,3 +1,9 @@
+<script setup>
+import { useAuth } from '../composables/useAuth'
+
+const { user } = useAuth()
+</script>
+
 <template>
   <footer class="footer">
     <div class="container footer__inner">
@@ -8,7 +14,7 @@
         <p>Plateforme centralisée pour la vie du campus de l'Université Privée de Marrakech. Vivez l'expérience UPM.</p>
       </div>
 
-      <div class="footer__links">
+      <div v-if="user" class="footer__links">
         <h6>Navigation</h6>
         <ul>
           <li><router-link to="/">Dashboard</router-link></li>

@@ -42,7 +42,7 @@ const handleSubmit = async () => {
 
     <div class="auth-form-panel">
       <div class="auth-form-wrap">
-        <div class="auth-logo">UPM <span>Events</span></div>
+        <div class="auth-logo"><img src="/src/assets/favicon.svg" alt="UPM Logo" class="w-12 h-12" />UPM <span>Events</span></div>
         
         <div class="space-y-2">
           <h1 class="auth-heading">Bienvenue.</h1>
