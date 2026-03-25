@@ -97,6 +97,17 @@ export function useEvents() {
     }
   }
 
+  const unregisterFromEvent = async (eventId, userId) => {
+    const eventRef = doc(db, 'events', eventId)
+    try {
+      await updateDoc(eventRef, {
+        attendees: arrayRemove(userId)
+      })
+    } catch (err) {
+      error.value = 'Could not unregister from event'
+    }
+  }
+
   return {
     events,
     polls,
@@ -105,6 +116,7 @@ export function useEvents() {
     getEvents,
     addEvent,
     toggleVote,
-    registerForEvent
+    registerForEvent,
+    unregisterFromEvent
   }
 }

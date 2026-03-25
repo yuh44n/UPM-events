@@ -61,15 +61,17 @@ const filteredEvents = computed(() => {
 
 <template>
   <div class="container">
-    <header class="home-hero">
+    <div class="home-hero section">
       <div class="home-hero__eyebrow">
         <span class="home-hero__eyebrow-line"></span>
         <span class="overline">Vie de Campus</span>
       </div>
-      <h1 class="display-italic">UPM Events.</h1>
-      <h2>Découvrez, vibrez, participez.</h2>
-      <p class="section--sm max-w-xl">Plongez dans l'effervescence de l'Université Internationale de Marrakech. Une plateforme unique pour tous vos événements.</p>
-    </header>
+      <h1 class="display-main mb-4">UPM Events.</h1>
+      <h2 class="display-italic text-gold mb-8">Découvrez, vibrez, participez.</h2>
+      <p class="max-w-2xl text-lg opacity-80 leading-relaxed">
+        Plongez dans l'effervescence de l'Université Privée de Marrakech. Une plateforme unique pour tous vos événements.
+      </p>
+    </div>
 
     <div class="filter-bar">
       <button 

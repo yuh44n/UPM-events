@@ -26,7 +26,7 @@ const handleSubmit = async () => {
   <div class="auth-page">
     <div class="auth-panel">
       <div class="auth-panel__title">Rejoignez la <span class="display-italic">Scène.</span></div>
-      <p class="auth-panel__sub">Connectez-vous pour découvrir les événements exclusifs de l'Université Internationale de Marrakech.</p>
+      <p class="auth-panel__sub">Connectez-vous pour découvrir les événements exclusifs de l'Université Privée de Marrakech.</p>
     </div>
 
     <div class="auth-form-panel">

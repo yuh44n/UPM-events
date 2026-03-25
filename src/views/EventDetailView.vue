@@ -2,23 +2,25 @@
 import { onMounted, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { db } from '../firebase/config'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, addDoc, collection, serverTimestamp, query, where, getDocs, deleteDoc } from 'firebase/firestore'
 import { useAuth } from '../composables/useAuth'
 import { useEvents } from '../composables/useEvents'
 import { useNotifications } from '../composables/useNotifications'
-import { Calendar, MapPin, Users, DollarSign, ChevronLeft, CheckCircle2, AlertTriangle } from 'lucide-vue-next'
+import { Calendar, MapPin, Users, DollarSign, ChevronLeft, CheckCircle2, AlertTriangle, UserMinus } from 'lucide-vue-next'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import BadgeStatus from '../components/BadgeStatus.vue'
+import CommentSection from '../components/CommentSection.vue'
 
 const route = useRoute()
 const router = useRouter()
 const { user, userData } = useAuth()
-const { registerForEvent } = useEvents()
+const { registerForEvent, unregisterFromEvent } = useEvents()
 const { notify } = useNotifications()
 
 const event = ref(null)
 const isPending = ref(true)
 const isRegistering = ref(false)
+const isUnregistering = ref(false)
 
 onMounted(async () => {
   const docRef = doc(db, 'events', route.params.id)
@@ -45,11 +47,59 @@ const handleEnroll = async () => {
   isRegistering.value = true
   
   await registerForEvent(event.value.id, user.value.uid)
+  
+  // Create a reminder notification
+  try {
+    await addDoc(collection(db, 'notifications'), {
+      userId: user.value.uid,
+      type: 'reminder',
+      message: `Rappel : Vous êtes inscrit à l'événement "${event.value.title}".`,
+      link: `/event/${event.value.id}`,
+      read: false,
+      createdAt: serverTimestamp()
+    })
+  } catch (err) {
+    console.error('Error creating notification:', err)
+  }
+
   notify('Inscription réussie !', 'success')
   
   // Refresh local state
   event.value.attendees.push(user.value.uid)
   isRegistering.value = false
+}
+
+const handleUnenroll = async () => {
+  if (!user.value || isUnregistering.value) return
+  if (!confirm('Voulez-vous vraiment annuler votre inscription ?')) return
+  
+  isUnregistering.value = true
+  
+  try {
+    await unregisterFromEvent(event.value.id, user.value.uid)
+    
+    // Remove the reminder notification
+    const q = query(
+      collection(db, 'notifications'), 
+      where('userId', '==', user.value.uid),
+      where('link', '==', `/event/${event.value.id}`),
+      where('type', '==', 'reminder')
+    )
+    const notifSnap = await getDocs(q)
+    for (const d of notifSnap.docs) {
+      await deleteDoc(doc(db, 'notifications', d.id))
+    }
+
+    notify('Inscription annulée', 'info')
+    
+    // Refresh local state
+    event.value.attendees = event.value.attendees.filter(id => id !== user.value.uid)
+  } catch (err) {
+    console.error('Error during unregistration:', err)
+    notify('Erreur lors de l\'annulation', 'danger')
+  } finally {
+    isUnregistering.value = false
+  }
 }
 
 const formatDate = (date) => {
@@ -97,6 +147,13 @@ const formatDate = (date) => {
             <h4 class="overline mb-4">À propos de l'événement</h4>
             <p class="whitespace-pre-line">{{ event.description }}</p>
           </div>
+
+          <!-- Comment Section -->
+          <CommentSection 
+            v-if="event.status === 'confirmed'"
+            :eventId="event.id" 
+            :isParticipant="isEnrolled || userData?.role === 'club'" 
+          />
         </div>
 
         <aside class="event-detail__sidebar">
@@ -142,9 +199,20 @@ const formatDate = (date) => {
               <div v-else class="spinner-inline"></div>
             </button>
 
-            <div v-if="isEnrolled" class="flex items-center justify-center gap-2 text-clr-free font-medium">
-              <CheckCircle2 class="w-5 h-5" />
-              <span>Vous êtes inscrit</span>
+            <div v-if="isEnrolled" class="space-y-3">
+              <div class="flex items-center justify-center gap-2 text-clr-free font-medium">
+                <CheckCircle2 class="w-5 h-5" />
+                <span>Vous êtes inscrit</span>
+              </div>
+              <button 
+                @click="handleUnenroll"
+                :disabled="isUnregistering"
+                class="btn btn-ghost btn-full btn-sm"
+              >
+                <UserMinus class="w-4 h-4 mr-2" />
+                <span v-if="!isUnregistering">Annuler l'inscription</span>
+                <div v-else class="spinner-inline"></div>
+              </button>
             </div>
 
             <p v-if="!canEnroll && !isEnrolled && event.status === 'confirmed'" class="form-error">

@@ -2,6 +2,7 @@
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { LogOut } from 'lucide-vue-next'
+import NotificationPanel from './NotificationPanel.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -36,6 +37,7 @@ const handleLogout = async () => {
 
       <!-- Profile Actions -->
       <div v-if="user" class="navbar__profile">
+        <NotificationPanel />
         <div class="navbar__avatar" :title="userData?.displayName">
           {{ userData?.displayName?.charAt(0).toUpperCase() || 'U' }}
         </div>
