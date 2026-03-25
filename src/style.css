@@ -220,6 +220,12 @@ p { color: var(--text-secondary); font-size: 0.93rem; line-height: 1.8; }
 .navbar__logo {
   font-family: var(--font-display); font-size: 1.4rem; font-weight: 600;
   color: var(--gold-200); letter-spacing: 0.06em; flex-shrink: 0; text-decoration: none;
+  display: flex; align-items: center; gap: 10px;
+}
+.navbar__favicon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 .navbar__logo span { color: var(--text-primary); font-weight: 300; }
 .navbar__nav { display: flex; align-items: center; gap: 28px; list-style: none; }

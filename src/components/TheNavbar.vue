@@ -19,6 +19,7 @@ const handleLogout = async () => {
     <div class="navbar__inner">
       <div class="navbar__left">
         <router-link to="/" class="navbar__logo">
+          <img src="/src/assets/favicon.svg" alt="UPM" class="navbar__favicon" />
           UPM <span>Events</span>
         </router-link>
 
