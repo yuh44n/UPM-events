@@ -85,9 +85,15 @@ const clear = () => {
       </div>
 
       <!-- Uploading Overlay -->
-      <div v-if="isPending" class="absolute inset-0 bg-surface-0/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
+      <div v-if="isPending" class="absolute inset-0 bg-surface-0/80 backdrop-blur-sm flex flex-col items-center justify-center gap-4 px-8">
         <div class="spinner"></div>
-        <p class="overline">Envoi en cours...</p>
+        <div class="w-full h-1.5 bg-surface-2 rounded-full overflow-hidden border border-bdr-soft">
+          <div 
+            class="h-full bg-gold-200 transition-all duration-300 ease-out"
+            :style="{ width: `${progress}%` }"
+          ></div>
+        </div>
+        <p class="overline text-gold-200">{{ progress }}% - Envoi en cours...</p>
       </div>
 
       <!-- Success Overlay -->

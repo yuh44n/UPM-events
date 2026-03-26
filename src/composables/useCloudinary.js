@@ -17,22 +17,36 @@ export function useCloudinary() {
     formData.append('file', file)
     formData.append('upload_preset', UPLOAD_PRESET)
 
-    try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-        method: 'POST',
-        body: formData
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`)
+
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          progress.value = Math.round((e.loaded * 100) / e.total)
+        }
       })
 
-      if (!res.ok) throw new Error('Could not upload image')
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const data = JSON.parse(xhr.responseText)
+          isPending.value = false
+          resolve(data.secure_url)
+        } else {
+          error.value = 'Could not upload image'
+          isPending.value = false
+          resolve(null)
+        }
+      })
 
-      const data = await res.json()
-      isPending.value = false
-      return data.secure_url
-    } catch (err) {
-      error.value = err.message
-      isPending.value = false
-      return null
-    }
+      xhr.addEventListener('error', () => {
+        error.value = 'Network error'
+        isPending.value = false
+        resolve(null)
+      })
+
+      xhr.send(formData)
+    })
   }
 
   return {

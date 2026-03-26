@@ -28,7 +28,10 @@ const handleVote = async () => {
 <template>
   <div class="vote-action">
     <div class="vote-count">
-      <strong>{{ votes.length }}</strong> {{ votes.length > 1 ? 'Intérêts' : 'Intérêt' }}
+      <transition name="pop" mode="out-in">
+        <strong :key="votes.length">{{ votes.length }}</strong>
+      </transition>
+      {{ votes.length > 1 ? 'Intérêts' : 'Intérêt' }}
     </div>
     <button 
       @click.prevent="handleVote"
@@ -40,3 +43,18 @@ const handleVote = async () => {
     </button>
   </div>
 </template>
+
+<style scoped>
+.pop-enter-active {
+  animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.pop-leave-active {
+  animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) reverse;
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+</style>
